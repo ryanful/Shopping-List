@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -10,8 +11,25 @@ import {
 } from "react-native";
 
 import Item from "./components/Item";
+import { useState } from "react";
 
 export default function App() {
+  Keyboard.dismiss();
+  const [task, setTask] = useState();
+  const [taskItems, setTaskItems] = useState([]);
+
+  const handleAddTask = () => {
+    setTaskItems([...taskItems, task]);
+    setTask(null);
+    console.log(task);
+  };
+
+  const completeTask = (index) => {
+    let itemsCopy = [...taskItems];
+    itemsCopy.splice(index, 1);
+    setTaskItems(itemsCopy);
+  };
+
   return (
     <View style={styles.container}>
       {/* Shopping List */}
@@ -24,8 +42,13 @@ export default function App() {
 
         {/* items left */}
         <View style={styles.items}>
-          <Item name={"Banana"} amount={1} />
-          <Item name={"Apple"} amount={2} />
+          {taskItems.map((item, index) => {
+            return (
+              <TouchableOpacity key={index} onPress={() => completeTask(index)}>
+                <Item name={item} amount={1} />
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* items found */}
@@ -36,9 +59,14 @@ export default function App() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.writeTaskWrapper}
       >
-        <TextInput style={styles.input} placeholder="Add an Item" />
+        <TextInput
+          style={styles.input}
+          placeholder="Add an Item"
+          value={task}
+          onChangeText={(text) => setTask(text)}
+        />
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => handleAddTask()}>
           <View style={styles.addWrapper}>
             <Text style={styles.addText}>+</Text>
           </View>
@@ -51,7 +79,14 @@ export default function App() {
 
 const styles = StyleSheet.create({
   addText: {},
-  addWrapper: {},
+  addWrapper: {
+    width: 60,
+    height: 60,
+    backgroundColor: "#fff",
+    borderRadius: 60,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#ededed",
@@ -62,7 +97,14 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     paddingHorizontal: 20,
   },
-  input: {},
+  input: {
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    backgroundColor: "#fff",
+    borderRadius: 60,
+    borderColor: "#c0c0c0",
+    width: 250,
+  },
   items: {
     marginTop: 30,
   },
@@ -75,7 +117,7 @@ const styles = StyleSheet.create({
     bottom: 60,
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "center",
   },
 });
