@@ -14,20 +14,29 @@ import Item from "./components/Item";
 import { useState } from "react";
 
 export default function App() {
-  Keyboard.dismiss();
-  const [task, setTask] = useState();
-  const [taskItems, setTaskItems] = useState([]);
+  const [item, setItem] = useState();
+  const [itemsLeft, setItemsLeft] = useState([]);
+  const [itemsFound, setItemsFound] = useState([]);
 
-  const handleAddTask = () => {
-    setTaskItems([...taskItems, task]);
-    setTask(null);
-    console.log(task);
+  const handleAddItem = () => {
+    Keyboard.dismiss();
+    setItemsLeft([...itemsLeft, item]);
+    setItem(null);
+    console.log(item);
   };
 
-  const completeTask = (index) => {
-    let itemsCopy = [...taskItems];
+  const checkItem = (index) => {
+    let itemsCopy = [...itemsLeft];
+    setItemsFound([...itemsFound, itemsLeft[index]]);
     itemsCopy.splice(index, 1);
-    setTaskItems(itemsCopy);
+    setItemsLeft(itemsCopy);
+  };
+
+  const uncheckItem = (index) => {
+    let itemsCopy = [...itemsFound];
+    setItemsLeft([...itemsLeft, itemsFound[index]]);
+    itemsCopy.splice(index, 1);
+    setItemsFound(itemsCopy);
   };
 
   return (
@@ -42,9 +51,10 @@ export default function App() {
 
         {/* items left */}
         <View style={styles.items}>
-          {taskItems.map((item, index) => {
+          <Text style={styles.h1}>Items Left</Text>
+          {itemsLeft.map((item, index) => {
             return (
-              <TouchableOpacity key={index} onPress={() => completeTask(index)}>
+              <TouchableOpacity key={index} onPress={() => checkItem(index)}>
                 <Item name={item} amount={1} />
               </TouchableOpacity>
             );
@@ -52,21 +62,31 @@ export default function App() {
         </View>
 
         {/* items found */}
+        <View style={styles.items}>
+          <Text style={styles.h1}>Items Found</Text>
+          {itemsFound.map((item, index) => {
+            return (
+              <TouchableOpacity key={index} onPress={() => uncheckItem(index)}>
+                <Item name={item} amount={1} />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
 
-      {/* Write A Task */}
+      {/* Write A Item */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.writeTaskWrapper}
+        style={styles.writeItemWrapper}
       >
         <TextInput
           style={styles.input}
           placeholder="Add an Item"
-          value={task}
-          onChangeText={(text) => setTask(text)}
+          value={item}
+          onChangeText={(text) => setItem(text)}
         />
 
-        <TouchableOpacity onPress={() => handleAddTask()}>
+        <TouchableOpacity onPress={() => handleAddItem()}>
           <View style={styles.addWrapper}>
             <Text style={styles.addText}>+</Text>
           </View>
@@ -97,6 +117,9 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     paddingHorizontal: 20,
   },
+  h1: {
+    fontSize: 18,
+  },
   input: {
     paddingVertical: 15,
     paddingHorizontal: 15,
@@ -112,7 +135,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-  writeTaskWrapper: {
+  writeItemWrapper: {
     position: "absolute",
     bottom: 60,
     width: "100%",
