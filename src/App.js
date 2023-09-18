@@ -48,6 +48,9 @@ export default function App() {
         {/* edit button */}
 
         {/* progress bar */}
+        <Text>
+          {itemsFound.length} / {itemsLeft.length + itemsFound.length} found
+        </Text>
 
         {/* items left */}
         <View style={styles.items}>
